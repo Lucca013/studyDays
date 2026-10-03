@@ -30,7 +30,7 @@ public class UsuarioController {
         return usuarioRepository.findAll();
     }
 
-    @PostMapping("/cadastrarUsuario")
+    @PostMapping("/cadastrar")
     public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody Usuario usuario) {
         usuario.setId(null); 
         Usuario salvo = usuarioRepository.save(usuario);
@@ -39,7 +39,7 @@ public class UsuarioController {
     // não dá para mudar o tipo de retorno dessa função para ser Boolean?
     // vai bater um pouco melhor com o diagrama de classes 
 
-    @PostMapping("/autenticarUsuario")
+    @PostMapping("/autenticar")
     public ResponseEntity<Boolean> autenticarUsuario(@RequestBody Usuario usuario){
         Usuario usuarioBanco = usuarioRepository.findByNome(usuario.getNome()).orElse(null);
 
