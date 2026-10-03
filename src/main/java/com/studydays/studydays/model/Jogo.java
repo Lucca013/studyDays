@@ -31,6 +31,7 @@ public class Jogo {
     @JoinColumn(name = "usuario_id")
     private Usuario jogador;
 
+    /* 
     @Column(nullable = false)
     private int pontoMelhoria;
 
@@ -42,6 +43,7 @@ public class Jogo {
 
     @Column(nullable = false)
     private int turnoAtual;
+    */
 
     // futuramente, para implementar a lógica do jogo, também será adicionado:
     // uma referência a classe "Evento" e "Progresso" 

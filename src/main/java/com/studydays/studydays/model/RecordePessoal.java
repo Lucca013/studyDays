@@ -17,14 +17,15 @@ import lombok.Setter;
 @Setter 
 @NoArgsConstructor 
 @AllArgsConstructor 
-public class Ranking {
+public class RecordePessoal {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column (nullable = false)
+    private int valorPontuacao;
+
     /* @Column (nullable = false)
     private Usuario jogador; */
 
-    @Column (nullable = false)
-    private int valorPontuacao;
 }
