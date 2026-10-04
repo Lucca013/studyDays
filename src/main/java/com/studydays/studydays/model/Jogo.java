@@ -19,7 +19,6 @@ import lombok.Setter;
 @Table 
 @Getter 
 @Setter 
-@NoArgsConstructor 
 @AllArgsConstructor 
 public class Jogo {
     @Id 
@@ -34,7 +33,6 @@ public class Jogo {
     @JsonIgnore 
     private Usuario jogador;
 
-    /* 
     @Column(nullable = false)
     private int pontoMelhoria;
 
@@ -46,7 +44,14 @@ public class Jogo {
 
     @Column(nullable = false)
     private int turnoAtual;
-    */
+
+    public Jogo(){ // o ponto inicial de todas as partidas é o mesmo, é redundante enviar essas informações via API para cadastro do jogo
+        this.status = "INICIADO";
+        this.pontoMelhoria = 0;
+        this.pontuacaoAtual = 0;
+        this.faseAtual = 0;
+        this.turnoAtual = 0;
+    }
 
     // futuramente, para implementar a lógica do jogo, também será adicionado:
     // uma referência a classe "Evento" e "Progresso" 

@@ -26,8 +26,9 @@ public class JogoController {
     }
 
     @PostMapping("/cadastrar/usuario/{usuarioId}")
-    public ResponseEntity<Jogo> cadastrarJogo(@RequestBody Jogo jogo, @PathVariable Long usuarioId){
+    public ResponseEntity<Jogo> cadastrarJogo(@PathVariable Long usuarioId){
         var usuario = usuarioRepository.findById(usuarioId);
+        Jogo jogo = new Jogo();
 
         if(usuario.isEmpty()){
             return ResponseEntity.notFound().build();
