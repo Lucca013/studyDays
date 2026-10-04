@@ -7,17 +7,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity 
 @Table 
 @Getter 
 @Setter 
+@NoArgsConstructor 
 @AllArgsConstructor 
 public class Progresso {
     @Id 
@@ -36,10 +37,9 @@ public class Progresso {
     @Column(nullable = false)
     private int turnoAtual;
 
-    @OneToOne 
-    @JoinColumn(name = "jogo_id")
+    @OneToOne(mappedBy = "progressoAtual")
     @JsonIgnore 
-    private final Jogo jogo;
+    private Jogo jogo;
 
     public Progresso(Jogo jogo){
         this.pontoMelhoria = 0;

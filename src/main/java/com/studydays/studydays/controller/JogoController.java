@@ -52,4 +52,13 @@ public class JogoController {
     public List<Jogo> listarJogos(){
         return repository.findAll();
     }
+
+    @GetMapping("/listar/{jogoId}")
+    public ResponseEntity<Jogo> listarJogoEspecifico(@PathVariable Long jogoId){
+        var jogo = repository.findById(jogoId);
+        if(jogo.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(jogo.get());
+    }
 }

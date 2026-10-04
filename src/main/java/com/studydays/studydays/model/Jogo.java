@@ -2,6 +2,7 @@ package com.studydays.studydays.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,7 +38,7 @@ public class Jogo {
     @JoinColumn(name = "evento_id")
     private Evento eventoAtual;
 
-    @OneToOne 
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "progresso_id")
     private Progresso progressoAtual;
 
