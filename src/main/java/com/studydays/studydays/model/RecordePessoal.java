@@ -1,5 +1,7 @@
 package com.studydays.studydays.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +31,7 @@ public class RecordePessoal {
 
     @OneToOne 
     @JoinColumn(name = "usuario_id")
+    @JsonIgnoreProperties({"jogos", "senhaHash"}) // para não retornar (1) lista de jogos (2) a senha do usuário na listagem de recordes 
     private Usuario jogador; 
 
 }
