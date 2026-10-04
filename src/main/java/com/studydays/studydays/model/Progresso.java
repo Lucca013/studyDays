@@ -8,40 +8,44 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
+@Entity 
 @Table 
 @Getter 
 @Setter 
 @AllArgsConstructor 
-public class Jogo {
+public class Progresso {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column (nullable = false)
-    private String status;
+    @Column(nullable = false)
+    private int pontoMelhoria;
 
-    @ManyToOne 
-    @JoinColumn(name = "usuario_id")
-    @JsonIgnore 
-    private Usuario jogador;
+    @Column(nullable = false)
+    private int pontuacaoAtual;
 
-    @ManyToOne 
-    @JoinColumn(name = "evento_id")
-    private Evento eventoAtual;
+    @Column(nullable = false)
+    private int faseAtual;
+
+    @Column(nullable = false)
+    private int turnoAtual;
 
     @OneToOne 
-    @JoinColumn(name = "progresso_id")
-    private Progresso progressoAtual;
+    @JoinColumn(name = "jogo_id")
+    @JsonIgnore 
+    private final Jogo jogo;
 
-    public Jogo(){ 
-        this.status = "INICIADO";
+    public Progresso(Jogo jogo){
+        this.pontoMelhoria = 0;
+        this.pontuacaoAtual = 0;
+        this.faseAtual = 0;
+        this.turnoAtual = 0;
+        this.jogo = jogo;
     }
 }
