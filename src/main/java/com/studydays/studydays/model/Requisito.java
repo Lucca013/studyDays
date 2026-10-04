@@ -6,15 +6,44 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Requisito {
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column(nullable = false)
     private String tipo;
 
     @Column(nullable = false)
     private int valor;
+
+    public boolean validar(Jogo jogo) {
+        switch (tipo) {
+            case "FASE_MINIMA":
+                return jogo.getFaseAtual() >= valor;
+
+            case "TURNO_MINIMO":
+                return jogo.getTurnoAtual() >= valor;
+
+            case "PONTUACAO_MINIMA":
+                return jogo.getPontuacaoAtual() >= valor;
+
+            case "PONTOS_MELHORIA_MINIMO":
+                return jogo.getPontoMelhoria() >= valor;
+
+            default:
+                return false;
+        }
+    }
 }

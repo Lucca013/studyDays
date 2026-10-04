@@ -24,12 +24,6 @@ public class UsuarioController {
     public UsuarioController(UsuarioRepository usuarioRepository) {
         this.repository = usuarioRepository;
     }
-
-    // só para testes, definitivamente não preciso de uma função assim depois 
-    @GetMapping("/listar")
-    public List<Usuario> listarUsuarios(){
-        return repository.findAll();
-    }
     
     @GetMapping("/listar/{usuarioId}")
     public ResponseEntity<Usuario> listarUsuarioEspecifico(@PathVariable Long usuarioId){
