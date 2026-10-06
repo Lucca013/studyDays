@@ -31,7 +31,7 @@ public class RecordePessoal {
 
     @OneToOne 
     @JoinColumn(name = "usuario_id")
-    @JsonIgnoreProperties({"jogos"}) // para não retornar (1) lista de jogos (2) a senha do usuário na listagem de recordes 
+    @JsonIgnoreProperties({"jogos", "senhaHash"}) // para não retornar (1) lista de jogos (2) a senha do usuário na listagem de recordes 
     private Usuario jogador; 
 
 }

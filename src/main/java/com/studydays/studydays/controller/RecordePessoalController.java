@@ -29,8 +29,8 @@ public class RecordePessoalController {
 
     // Lista todos os recordes de todos os jogadores
     @GetMapping("/listar")
-    public List<RecordePessoal> listarRecordes() {
-        return repository.findAll();
+        public List<RecordePessoal> listarRecordes() {
+            return repository.findAllByOrderByValorPontuacaoDesc();
     }
 
     // Cadastra um novo recorde pessoal (já vinculando com um ususário) 
