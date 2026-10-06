@@ -28,12 +28,14 @@ public class RecordePessoalController {
     }
 
     // Lista todos os recordes de todos os jogadores
+    // dava p limitar p top 100 tambem, coisa assim
     @GetMapping("/listar")
         public List<RecordePessoal> listarRecordes() {
             return repository.findAllByOrderByValorPontuacaoDesc();
     }
 
     // Cadastra um novo recorde pessoal (já vinculando com um ususário) 
+    // n da certo p atualizar, uso um novo endpoint ou trato isso aqui? 
     @PostMapping("/cadastrar/usuario/{usuarioId}")
     public ResponseEntity<RecordePessoal> cadastrarRecorde(@RequestBody RecordePessoal recordePessoal, @PathVariable Long usuarioId) {
         var usuario = usuarioRepository.findById(usuarioId);

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
 import com.studydays.studydays.model.Usuario;
 import com.studydays.studydays.repository.UsuarioRepository;
 
