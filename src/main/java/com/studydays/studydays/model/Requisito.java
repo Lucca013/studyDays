@@ -41,6 +41,12 @@ public class Requisito {
             case "PONTOS_MELHORIA_MINIMO":
                 return jogo.getPontoMelhoria() >= valor;
 
+            case "FASE_EXATA":
+                return jogo.getFaseAtual() == valor;
+
+            case "TURNO_EXATO":
+                return jogo.getTurnoAtual() == valor;
+                
             default:
                 return false;
         }

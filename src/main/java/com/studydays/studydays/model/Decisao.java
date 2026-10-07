@@ -39,4 +39,13 @@ public class Decisao {
     )
     List<Requisito> listaRequisitos = new ArrayList<>();
 
+    public boolean verificarRequisitos(Jogo jogo) {
+        for (Requisito requisito : listaRequisitos) {
+            if (!requisito.validar(jogo)) {
+                return false;
+            }
+        }
+        return true;
+}
+
 }   

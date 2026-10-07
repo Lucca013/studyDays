@@ -2,6 +2,7 @@ package com.studydays.studydays.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -63,6 +64,27 @@ public class Jogo {
     )
     private List<Melhoria> listaMelhorias= new ArrayList<>();
 
+    public Evento sortearEvento(List<Evento> eventosValidos){
+        if(eventosValidos.isEmpty()){
+            return null;
+        }
+        Random random = new Random();
+        int posicao = random.nextInt(eventosValidos.size());
+        return eventosValidos.get(posicao);
+    }
+
+    public Decisao sortearDecisao(List<Decisao> decisoesValidas) {
+        if (decisoesValidas.isEmpty()) {
+            return null;
+        }
+
+        Random random = new Random();
+
+        int posicao = random.nextInt(decisoesValidas.size());
+
+        return decisoesValidas.get(posicao);
+    }
+
     public Jogo() {
         this.status = "INICIADO";
         this.pontoMelhoria = 0;
@@ -70,4 +92,9 @@ public class Jogo {
         this.faseAtual = 0;
         this.turnoAtual = 0;
     }
+
+    public record EventoGeradoResponse(
+        Evento evento,
+        List<Decisao> decisoes
+    ) {}
 }

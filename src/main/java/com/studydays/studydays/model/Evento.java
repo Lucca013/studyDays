@@ -48,4 +48,13 @@ public class Evento {
         inverseJoinColumns = @JoinColumn(name = "requisito_id")
     )
     List<Requisito> listaRequisitos = new ArrayList<>();
+
+    public boolean verificarRequisitos(Jogo jogo){
+        for (Requisito requisito : listaRequisitos){
+            if(!requisito.validar(jogo)){
+                return false;
+            }
+        }
+        return true;
+    }
 }

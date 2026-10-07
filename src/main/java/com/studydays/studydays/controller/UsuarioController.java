@@ -43,7 +43,6 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
-    // Autentica o usuário 
     @PostMapping("/autenticar")
     public ResponseEntity<Usuario> autenticarUsuario(@Valid @RequestBody Usuario login) {
         var usuario = repository.findByNome(login.getNome()).orElseThrow(AutenticacaoException::new);

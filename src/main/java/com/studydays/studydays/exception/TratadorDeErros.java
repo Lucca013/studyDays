@@ -27,4 +27,9 @@ public class TratadorDeErros {
     public ResponseEntity<String> tratarUsuarioJaExistente(NomeJaRegistradoException ex){
         return ResponseEntity.status(409).body(ex.getMessage());
     }
+
+    @ExceptionHandler(JogoNaoEncontradoException.class)
+    public ResponseEntity<String> tratarJogoNaoEncontrado(JogoNaoEncontradoException ex){
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
 }
