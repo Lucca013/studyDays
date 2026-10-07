@@ -33,7 +33,7 @@ public class Decisao {
 
     @ManyToMany 
     @JoinTable (
-        name = "Exige",
+        name = "RequisitosDecisao",
         joinColumns = @JoinColumn(name = "decisao_id"),
         inverseJoinColumns = @JoinColumn(name = "requisito_id")
     )

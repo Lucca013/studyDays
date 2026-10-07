@@ -11,13 +11,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Entity 
-
+@Entity
+@Table
+@Getter
+@Setter
+@AllArgsConstructor
 public class Melhoria {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column(nullable = false)
     private String nome;
@@ -27,7 +34,7 @@ public class Melhoria {
 
     @ManyToMany 
     @JoinTable (
-        name = "Exige",
+        name = "RequisitosMelhoria",
         joinColumns = @JoinColumn(name = "melhoria_id"),
         inverseJoinColumns = @JoinColumn(name = "requisito_id")
     )

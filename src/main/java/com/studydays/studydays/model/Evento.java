@@ -43,7 +43,7 @@ public class Evento {
 
     @ManyToMany 
     @JoinTable (
-        name = "Exige",
+        name = "RequisitosEvento",
         joinColumns = @JoinColumn(name = "evento_id"),
         inverseJoinColumns = @JoinColumn(name = "requisito_id")
     )
