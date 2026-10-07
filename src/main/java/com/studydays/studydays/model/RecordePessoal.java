@@ -29,6 +29,9 @@ public class RecordePessoal {
     @Column (nullable = false)
     private int valorPontuacao;
 
+    @Column (nullable = false)
+    private String dataObtida;
+
     @OneToOne 
     @JoinColumn(name = "usuario_id")
     @JsonIgnoreProperties({"jogos", "senhaHash"}) // para não retornar (1) lista de jogos (2) a senha do usuário na listagem de recordes 

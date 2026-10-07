@@ -1,5 +1,8 @@
 package com.studydays.studydays.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -8,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -49,6 +54,14 @@ public class Jogo {
 
     @Column(nullable = false)
     private int turnoAtual;
+
+    @ManyToMany 
+    @JoinTable (
+        name = "Liberou",
+        joinColumns = @JoinColumn(name = "jogo_id"),
+        inverseJoinColumns = @JoinColumn(name = "melhoria_id")
+    )
+    private List<Melhoria> listaMelhorias= new ArrayList<>();
 
     public Jogo() {
         this.status = "INICIADO";

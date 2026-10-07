@@ -29,7 +29,7 @@ public class RecordePessoalController {
     }
 
     // Lista todos os recordes de todos os jogadores
-    // dava p limitar p top 100 tambem, coisa assim
+    // dava p limitar p top 100 tambem, coisa assim... na real top 50? top 25? 
     @GetMapping("/listar")
         public List<RecordePessoal> listarRecordes() {
             return repository.findAllByOrderByValorPontuacaoDesc();

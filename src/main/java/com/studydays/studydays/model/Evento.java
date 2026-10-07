@@ -10,6 +10,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -37,4 +40,12 @@ public class Evento {
     @OneToMany(mappedBy = "eventoAtual")
     @JsonIgnore 
     private List<Jogo> jogos = new ArrayList<>();
+
+    @ManyToMany 
+    @JoinTable (
+        name = "Exige",
+        joinColumns = @JoinColumn(name = "evento_id"),
+        inverseJoinColumns = @JoinColumn(name = "requisito_id")
+    )
+    List<Requisito> listaRequisitos = new ArrayList<>();
 }

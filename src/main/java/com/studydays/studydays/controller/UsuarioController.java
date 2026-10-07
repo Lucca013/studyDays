@@ -34,9 +34,9 @@ public class UsuarioController {
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody Usuario usuario) {
-        // Se for um nome já cadastrado antes, joga a exception (ao invés de dar o erro do banco)
         var usuarioExistente = repository.findByNome(usuario.getNome());
-        if (usuarioExistente.isPresent()){throw new NomeJaRegistradoException();}
+        if (usuarioExistente.isPresent()){throw new NomeJaRegistradoException();} 
+        // Se for um nome já cadastrado antes, joga a exception (retorna um erro do banco se não tratar aqui)
 
         usuario.setId(null);
         Usuario salvo = repository.save(usuario);
