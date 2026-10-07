@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.studydays.studydays.exception.AutenticacaoException;
+import com.studydays.studydays.exception.NomeJaRegistradoException;
 import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
 import com.studydays.studydays.model.Usuario;
 import com.studydays.studydays.repository.UsuarioRepository;
@@ -26,34 +28,26 @@ public class UsuarioController {
 
     @GetMapping("/listar/{usuarioId}")
     public ResponseEntity<Usuario> listarUsuarioEspecifico(@PathVariable Long usuarioId) {
-        var usuario = repository.findById(usuarioId);
-
-        if (usuario.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(usuario.get());
+        var usuario = repository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
+        return ResponseEntity.ok(usuario);
     }
 
     @PostMapping("/cadastrar")
     public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody Usuario usuario) {
+        // Se for um nome já cadastrado antes, joga a exception (ao invés de dar o erro do banco)
+        var usuarioExistente = repository.findByNome(usuario.getNome());
+        if (usuarioExistente.isPresent()){throw new NomeJaRegistradoException();}
+
         usuario.setId(null);
         Usuario salvo = repository.save(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
-    // Autentica o usuário (Deixando assim para testes, mas não é uma boa continuar dessa forma)
+    // Autentica o usuário 
     @PostMapping("/autenticar")
     public ResponseEntity<Usuario> autenticarUsuario(@Valid @RequestBody Usuario login) {
-        var usuario = repository.findByNome(login.getNome());
-
-        if(usuario.isEmpty()){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if(!usuario.get().getSenhaHash().equals(login.getSenhaHash())){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        return ResponseEntity.ok(usuario.get());
+        var usuario = repository.findByNome(login.getNome()).orElseThrow(AutenticacaoException::new);
+        if(!usuario.getSenhaHash().equals(login.getSenhaHash())){throw new AutenticacaoException();}
+        return ResponseEntity.ok(usuario);
     };
 }

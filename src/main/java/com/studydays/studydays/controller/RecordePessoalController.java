@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
 import com.studydays.studydays.model.RecordePessoal;
 import com.studydays.studydays.repository.RecordePessoalRepository;
 import com.studydays.studydays.repository.UsuarioRepository;
@@ -38,13 +39,10 @@ public class RecordePessoalController {
     // n da certo p atualizar, uso um novo endpoint ou trato isso aqui? 
     @PostMapping("/cadastrar/usuario/{usuarioId}")
     public ResponseEntity<RecordePessoal> cadastrarRecorde(@RequestBody RecordePessoal recordePessoal, @PathVariable Long usuarioId) {
-        var usuario = usuarioRepository.findById(usuarioId);
-        if(usuario.isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
+        var usuario = usuarioRepository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
 
         recordePessoal.setId(null);
-        recordePessoal.setJogador(usuario.get());
+        recordePessoal.setJogador(usuario);
 
         RecordePessoal salvo = repository.save(recordePessoal);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
