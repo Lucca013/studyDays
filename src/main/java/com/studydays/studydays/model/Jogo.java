@@ -77,11 +77,8 @@ public class Jogo {
         if (decisoesValidas.isEmpty()) {
             return null;
         }
-
         Random random = new Random();
-
         int posicao = random.nextInt(decisoesValidas.size());
-
         return decisoesValidas.get(posicao);
     }
 
@@ -91,6 +88,7 @@ public class Jogo {
         this.pontuacaoAtual = 0;
         this.faseAtual = 0;
         this.turnoAtual = 0;
+        this.listaMelhorias = null;
     }
 
     public record EventoGeradoResponse(
