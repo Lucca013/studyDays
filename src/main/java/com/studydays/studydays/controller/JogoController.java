@@ -19,6 +19,7 @@ import com.studydays.studydays.model.Evento;
 import com.studydays.studydays.model.Jogo;
 import com.studydays.studydays.model.Jogo.EventoGeradoResponse;
 import com.studydays.studydays.repository.ConsequenciaRepository;
+import com.studydays.studydays.repository.DecisaoRepository;
 import com.studydays.studydays.repository.EventoRepository;
 import com.studydays.studydays.repository.JogoRepository;
 import com.studydays.studydays.repository.UsuarioRepository;
@@ -30,13 +31,15 @@ public class JogoController {
     private final UsuarioRepository usuarioRepository;
     private final EventoRepository eventoRepository;
     private final ConsequenciaRepository consequenciaRepository;
+    private final DecisaoRepository decisaoRepository;
 
     public JogoController(JogoRepository repository, UsuarioRepository usuarioRepository,
-            EventoRepository eventoRepository, ConsequenciaRepository consequenciaRepository) {
+            EventoRepository eventoRepository, ConsequenciaRepository consequenciaRepository, DecisaoRepository decisaoRepository) {
         this.repository = repository;
         this.usuarioRepository = usuarioRepository;
         this.eventoRepository = eventoRepository;
         this.consequenciaRepository = consequenciaRepository;
+        this.decisaoRepository = decisaoRepository;
     }
 
     @PostMapping("/cadastrar/usuario/{usuarioId}")
@@ -57,7 +60,7 @@ public class JogoController {
     }
 
     @GetMapping("/listar")
-    public List<Jogo> listarJogos() {
+    public List<Jogo> listarTodosJogos() {
         return repository.findAll();
     }
 
@@ -65,6 +68,12 @@ public class JogoController {
     public ResponseEntity<Jogo> listarJogoEspecifico(@PathVariable Long jogoId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
         return ResponseEntity.ok(jogo);
+    }
+
+    @GetMapping("/listar/usuario/{usuarioId}")
+    public List<Jogo> listarJogos(@PathVariable  Long usuarioId) {
+        var usuario = usuarioRepository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
+        return repository.findByJogador(usuario);
     }
 
     @PostMapping("/avancarEvento/{jogoId}")
@@ -121,4 +130,15 @@ public class JogoController {
 
         return ResponseEntity.ok(resposta);
     }
+
+    @GetMapping("/{jogoId}/escolha/{escolhaId}")
+    public ResponseEntity<Consequencia> processarEscolha(@PathVariable Long jogoId, @PathVariable Long escolhaId){
+        var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
+        var evento = jogo.getEventoAtual();
+
+        var consequencia = consequenciaRepository.findByEventoIdAndDecisaoId(evento.getId(), escolhaId).orElseThrow();
+
+        return ResponseEntity.ok(consequencia);
+    }
+
 }

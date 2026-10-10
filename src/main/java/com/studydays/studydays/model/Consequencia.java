@@ -1,5 +1,7 @@
 package com.studydays.studydays.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,9 +32,11 @@ public class Consequencia {
 
     @ManyToOne 
     @JoinColumn(name = "decisao_id")
+    @JsonIgnore // se quebrar alguma coisa²
     private Decisao decisao;
 
     @ManyToOne 
     @JoinColumn(name = "evento_id")
+    @JsonIgnore // se quebrar alguma coisa é por conta disso aqui
     private Evento evento;
 }

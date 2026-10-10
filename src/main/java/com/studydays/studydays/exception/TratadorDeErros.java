@@ -33,3 +33,4 @@ public class TratadorDeErros {
         return ResponseEntity.status(404).body(ex.getMessage());
     }
 }
+    
