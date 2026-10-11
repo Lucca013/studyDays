@@ -25,7 +25,7 @@ public class Consequencia {
     private Long id;
 
     @Column(nullable = false)
-    private int valorPontuacao;
+    private int valor_pontuacao;
     
     @Column(nullable = false)
     private String descricao;

@@ -41,6 +41,9 @@ public class Evento {
     @JsonIgnore 
     private List<Jogo> jogos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "evento")
+    private List<Dialogo> dialogos = new ArrayList<>();
+
     @ManyToMany 
     @JoinTable (
         name = "RequisitosEvento",
