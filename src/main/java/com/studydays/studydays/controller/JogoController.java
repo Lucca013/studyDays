@@ -19,6 +19,7 @@ import com.studydays.studydays.model.Evento;
 import com.studydays.studydays.model.Jogo;
 import com.studydays.studydays.dto.ProcessarEscolhaResponse;
 import com.studydays.studydays.dto.EventoGeradoResponse;
+import com.studydays.studydays.dto.JogoResponse;
 import com.studydays.studydays.repository.ConsequenciaRepository;
 import com.studydays.studydays.repository.EventoRepository;
 import com.studydays.studydays.repository.JogoRepository;
@@ -63,9 +64,17 @@ public class JogoController {
     }
 
     @GetMapping("/listar/{jogoId}")
-    public ResponseEntity<Jogo> listarJogoEspecifico(@PathVariable Long jogoId) {
+    public ResponseEntity<JogoResponse> listarJogoEspecifico(@PathVariable Long jogoId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
-        return ResponseEntity.ok(jogo);
+
+        var resposta = new JogoResponse(
+            jogo.getEventoAtual(),
+            jogo.getPontoMelhoria(),
+            jogo.getPontuacaoAtual(),
+            jogo.getListaMelhorias()
+        );
+
+        return ResponseEntity.ok(resposta);
     }
 
     @GetMapping("/listar/usuario/{usuarioId}")
@@ -119,6 +128,8 @@ public class JogoController {
             decisoesSorteadas.add(decisaoSorteada);
             decisoesValidas.remove(decisaoSorteada);
         }
+
+        jogo.setTurnoAtual(jogo.getTurnoAtual() + 1);   
 
         repository.save(jogo);
         EventoGeradoResponse resposta = new EventoGeradoResponse(eventoSorteado, decisoesSorteadas);

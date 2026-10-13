@@ -3,6 +3,8 @@ package com.studydays.studydays.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,23 +24,29 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor 
+@NoArgsConstructor
 public class Melhoria {
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nome;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String descricao;
 
-    @ManyToMany 
-    @JoinTable (
-        name = "RequisitosMelhoria",
-        joinColumns = @JoinColumn(name = "melhoria_id"),
-        inverseJoinColumns = @JoinColumn(name = "requisito_id")
-    )
+    @ManyToMany
+    @JoinTable(name = "RequisitosMelhoria", joinColumns = @JoinColumn(name = "melhoria_id"), inverseJoinColumns = @JoinColumn(name = "requisito_id"))
+    @JsonIgnore
     List<Requisito> listaRequisitos = new ArrayList<>();
+
+    public boolean verificarRequisitos(Jogo jogo) {
+        for (Requisito requisito : listaRequisitos) {
+            if (!requisito.validar(jogo)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

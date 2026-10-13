@@ -46,7 +46,10 @@ public class Requisito {
 
             case "TURNO_EXATO":
                 return jogo.getTurnoAtual() == valor;
-                
+
+            case "MELHORIA_ADQUIRIDA":
+                return jogo.getListaMelhorias().stream().anyMatch(melhoria -> melhoria.getId().equals((long) valor));
+
             default:
                 return false;
         }

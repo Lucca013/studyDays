@@ -88,6 +88,6 @@ public class Jogo {
         this.pontuacaoAtual = 0;
         this.faseAtual = 0;
         this.turnoAtual = 0;
-        this.listaMelhorias = null;
+        this.listaMelhorias = new ArrayList<>();
     }
 }

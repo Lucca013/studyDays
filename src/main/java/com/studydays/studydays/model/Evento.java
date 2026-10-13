@@ -31,10 +31,10 @@ public class Evento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String descricao;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String titulo;
 
     @OneToMany(mappedBy = "eventoAtual")
@@ -50,6 +50,7 @@ public class Evento {
         joinColumns = @JoinColumn(name = "evento_id"),
         inverseJoinColumns = @JoinColumn(name = "requisito_id")
     )
+    @JsonIgnore
     List<Requisito> listaRequisitos = new ArrayList<>();
 
     public boolean verificarRequisitos(Jogo jogo){
