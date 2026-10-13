@@ -17,9 +17,9 @@ import com.studydays.studydays.model.Consequencia;
 import com.studydays.studydays.model.Decisao;
 import com.studydays.studydays.model.Evento;
 import com.studydays.studydays.model.Jogo;
-import com.studydays.studydays.model.Jogo.EventoGeradoResponse;
+import com.studydays.studydays.dto.ProcessarEscolhaResponse;
+import com.studydays.studydays.dto.EventoGeradoResponse;
 import com.studydays.studydays.repository.ConsequenciaRepository;
-import com.studydays.studydays.repository.DecisaoRepository;
 import com.studydays.studydays.repository.EventoRepository;
 import com.studydays.studydays.repository.JogoRepository;
 import com.studydays.studydays.repository.UsuarioRepository;
@@ -31,15 +31,13 @@ public class JogoController {
     private final UsuarioRepository usuarioRepository;
     private final EventoRepository eventoRepository;
     private final ConsequenciaRepository consequenciaRepository;
-    private final DecisaoRepository decisaoRepository;
 
     public JogoController(JogoRepository repository, UsuarioRepository usuarioRepository,
-            EventoRepository eventoRepository, ConsequenciaRepository consequenciaRepository, DecisaoRepository decisaoRepository) {
+            EventoRepository eventoRepository, ConsequenciaRepository consequenciaRepository) {
         this.repository = repository;
         this.usuarioRepository = usuarioRepository;
         this.eventoRepository = eventoRepository;
         this.consequenciaRepository = consequenciaRepository;
-        this.decisaoRepository = decisaoRepository;
     }
 
     @PostMapping("/cadastrar/usuario/{usuarioId}")
@@ -100,8 +98,7 @@ public class JogoController {
         Evento eventoSorteado = jogo.sortearEvento(eventosValidos);
         jogo.setEventoAtual(eventoSorteado);
 
-        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(
-                eventoSorteado.getId());
+        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(eventoSorteado.getId());
 
         List<Decisao> decisoesValidas = new ArrayList<>();
 
@@ -124,21 +121,46 @@ public class JogoController {
         }
 
         repository.save(jogo);
-        EventoGeradoResponse resposta = new EventoGeradoResponse(
-                eventoSorteado,
-                decisoesSorteadas);
+        EventoGeradoResponse resposta = new EventoGeradoResponse(eventoSorteado, decisoesSorteadas);
 
         return ResponseEntity.ok(resposta);
     }
 
     @GetMapping("/{jogoId}/escolha/{escolhaId}")
-    public ResponseEntity<Consequencia> processarEscolha(@PathVariable Long jogoId, @PathVariable Long escolhaId){
+    public ResponseEntity<ProcessarEscolhaResponse> processarEscolha(@PathVariable Long jogoId, @PathVariable Long escolhaId){
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
         var evento = jogo.getEventoAtual();
 
         var consequencia = consequenciaRepository.findByEventoIdAndDecisaoId(evento.getId(), escolhaId).orElseThrow();
+        jogo.setPontuacaoAtual(jogo.getPontuacaoAtual() + consequencia.getValorPontuacao());
+        repository.save(jogo);
 
-        return ResponseEntity.ok(consequencia);
+        var resposta = new ProcessarEscolhaResponse(
+            consequencia.getValorPontuacao(),
+            consequencia.getDescricao(),
+            jogo.getPontuacaoAtual()
+        );
+
+        return ResponseEntity.ok(resposta);
     }
 
+    @GetMapping("/{jogoId}/escolhas")
+    public ResponseEntity<List<Decisao>> listarDecisoesValidas(@PathVariable Long jogoId) {
+
+        var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
+
+        var eventoAtual = jogo.getEventoAtual();
+
+        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(eventoAtual.getId());
+        List<Decisao> decisoesValidas = new ArrayList<>();
+
+        for (Consequencia consequencia : consequencias) {
+            Decisao decisao = consequencia.getDecisao();
+
+            if (decisao.verificarRequisitos(jogo) && !decisoesValidas.contains(decisao)) {
+                decisoesValidas.add(decisao);
+            }
+        }
+        return ResponseEntity.ok(decisoesValidas);
+    }
 }

@@ -1,5 +1,7 @@
 package com.studydays.studydays.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,19 +30,20 @@ public class Dialogo {
     private String fala;
 
     @Column(nullable = false)
-    private String nome_personagem;
+    private String nomePersonagem;
 
     @Column (nullable = false)
-    private String sprite_personagem;
+    private String spritePersonagem;
 
     @Column (nullable = false)
-    private String movimentacao_personagem;
+    private String movimentacaoPersonagem;
 
     @Column (nullable = false)
-    private int ordem_fala;
+    private int ordemFala;
 
     @ManyToOne 
     @JoinColumn(name = "evento_id")
+    @JsonIgnore 
     private Evento evento;
 
 }

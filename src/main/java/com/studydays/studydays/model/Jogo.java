@@ -90,9 +90,4 @@ public class Jogo {
         this.turnoAtual = 0;
         this.listaMelhorias = null;
     }
-
-    public record EventoGeradoResponse(
-        Evento evento,
-        List<Decisao> decisoes
-    ) {}
 }

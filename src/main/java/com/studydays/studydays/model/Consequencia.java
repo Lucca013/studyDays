@@ -25,18 +25,18 @@ public class Consequencia {
     private Long id;
 
     @Column(nullable = false)
-    private int valor_pontuacao;
+    private int valorPontuacao;
     
     @Column(nullable = false)
     private String descricao;
 
     @ManyToOne 
     @JoinColumn(name = "decisao_id")
-    @JsonIgnore // se quebrar alguma coisa²
+    @JsonIgnore 
     private Decisao decisao;
 
     @ManyToOne 
     @JoinColumn(name = "evento_id")
-    @JsonIgnore // se quebrar alguma coisa é por conta disso aqui
+    @JsonIgnore 
     private Evento evento;
 }

@@ -1,5 +1,7 @@
 package com.studydays.studydays.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,11 @@ public class UsuarioController {
     public ResponseEntity<Usuario> listarUsuarioEspecifico(@PathVariable Long usuarioId) {
         var usuario = repository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
         return ResponseEntity.ok(usuario);
+    }
+
+    @GetMapping("/listar")
+    public List<Usuario> listarUsuarios() {
+        return repository.findAll();
     }
 
     @PostMapping("/cadastrar")
