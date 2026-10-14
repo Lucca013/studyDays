@@ -1,5 +1,6 @@
 package com.studydays.studydays.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,6 +32,16 @@ public class TratadorDeErros {
     @ExceptionHandler(JogoNaoEncontradoException.class)
     public ResponseEntity<String> tratarJogoNaoEncontrado(JogoNaoEncontradoException ex){
         return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MelhoriaAdquiridaException.class)
+    public ResponseEntity<String> tratarMelhoriaJaAdquirida(MelhoriaAdquiridaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MelhoriaBloqueadaException.class)
+    public ResponseEntity<String> tratarMelhoriaBloqueada(MelhoriaBloqueadaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }
     

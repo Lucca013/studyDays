@@ -1,18 +1,21 @@
 package com.studydays.studydays.controller;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.function.EntityResponse;
 
 import com.studydays.studydays.dto.ListaMelhoriaResponse;
+import com.studydays.studydays.dto.MelhoriaAdquiridaResponse;
 import com.studydays.studydays.exception.JogoNaoEncontradoException;
+import com.studydays.studydays.exception.MelhoriaAdquiridaException;
+import com.studydays.studydays.exception.MelhoriaBloqueadaException;
 import com.studydays.studydays.model.Melhoria;
 import com.studydays.studydays.model.Requisito;
 import com.studydays.studydays.repository.JogoRepository;
@@ -78,5 +81,42 @@ public class MelhoriaController {
         }
 
         return ordem;
+    }
+
+    @PostMapping("/liberar/{melhoriaId}/jogo/{jogoId}")
+    public ResponseEntity<MelhoriaAdquiridaResponse> liberarMelhoria(@PathVariable Long melhoriaId, @PathVariable Long jogoId){
+        var jogo = jogoRepository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
+        var melhoria = repository.findById(melhoriaId).orElseThrow();
+
+        boolean melhoriaAdquirida = false;
+        for(Melhoria melhoriaBanco : jogo.getListaMelhorias()){
+            if(melhoriaBanco.getId().equals(melhoriaId)){
+                melhoriaAdquirida = true;
+                break;
+            }
+        }
+        if(melhoriaAdquirida){
+            throw new MelhoriaAdquiridaException();
+        }
+
+        if(!melhoria.verificarRequisitos(jogo)){
+            throw new MelhoriaBloqueadaException();
+        }
+
+        if(jogo.getPontoMelhoria() >= 1){
+            jogo.setPontoMelhoria((jogo.getPontoMelhoria() - 1));
+        }
+        else{
+            throw new MelhoriaBloqueadaException();
+        }
+        jogo.getListaMelhorias().add(melhoria);
+        jogoRepository.save(jogo);
+
+        var resposta = new MelhoriaAdquiridaResponse(
+            jogo.getPontoMelhoria(),
+            melhoria
+        );
+
+        return ResponseEntity.ok(resposta);
     }
 }
