@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.studydays.studydays.dto.AutenticadoResponse;
 import com.studydays.studydays.exception.AutenticacaoException;
 import com.studydays.studydays.exception.NomeJaRegistradoException;
 import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
@@ -29,9 +30,11 @@ public class UsuarioController {
     }
 
     @GetMapping("/listar/{usuarioId}")
-    public ResponseEntity<Usuario> listarUsuarioEspecifico(@PathVariable Long usuarioId) {
+    public ResponseEntity<AutenticadoResponse> listarUsuarioEspecifico(@PathVariable Long usuarioId) {
         var usuario = repository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
-        return ResponseEntity.ok(usuario);
+        
+        var resposta = new AutenticadoResponse(usuario.getId(),usuario.getNome());
+        return ResponseEntity.ok(resposta);
     }
 
     @GetMapping("/listar")
@@ -40,20 +43,24 @@ public class UsuarioController {
     }
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<Usuario> cadastrarUsuario(@Valid @RequestBody Usuario usuario) {
+    public ResponseEntity<AutenticadoResponse> cadastrarUsuario(@Valid @RequestBody Usuario usuario) {
         var usuarioExistente = repository.findByNome(usuario.getNome());
         if (usuarioExistente.isPresent()){throw new NomeJaRegistradoException();} 
         // Se for um nome já cadastrado antes, joga a exception (retorna um erro do banco se não tratar aqui)
 
         usuario.setId(null);
-        Usuario salvo = repository.save(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+        repository.save(usuario);
+        
+        var resposta = new AutenticadoResponse(usuario.getId(), usuario.getNome());
+        return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
     @PostMapping("/autenticar")
-    public ResponseEntity<Usuario> autenticarUsuario(@Valid @RequestBody Usuario login) {
+    public ResponseEntity<AutenticadoResponse> autenticarUsuario(@Valid @RequestBody Usuario login) {
         var usuario = repository.findByNome(login.getNome()).orElseThrow(AutenticacaoException::new);
         if(!usuario.getSenhaHash().equals(login.getSenhaHash())){throw new AutenticacaoException();}
-        return ResponseEntity.ok(usuario);
+
+        var resposta = new AutenticadoResponse(usuario.getId(),usuario.getNome());
+        return ResponseEntity.ok(resposta);
     };
 }

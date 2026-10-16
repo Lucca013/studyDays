@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.function.EntityResponse;
-
 import com.studydays.studydays.dto.ListaMelhoriaResponse;
 import com.studydays.studydays.dto.MelhoriaAdquiridaResponse;
 import com.studydays.studydays.exception.JogoNaoEncontradoException;

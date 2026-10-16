@@ -41,6 +41,12 @@ public class Evento {
     @JsonIgnore 
     private List<Jogo> jogos = new ArrayList<>();
 
+    @Column(nullable = false)
+    private boolean obrigatorio;
+
+    @Column(nullable = false)
+    private boolean finalizaJogo;
+
     @OneToMany(mappedBy = "evento")
     private List<Dialogo> dialogos = new ArrayList<>();
 

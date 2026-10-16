@@ -68,17 +68,16 @@ public class JogoController {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
 
         var resposta = new JogoResponse(
-            jogo.getEventoAtual(),
-            jogo.getPontoMelhoria(),
-            jogo.getPontuacaoAtual(),
-            jogo.getListaMelhorias()
-        );
+                jogo.getEventoAtual(),
+                jogo.getPontoMelhoria(),
+                jogo.getPontuacaoAtual(),
+                jogo.getListaMelhorias());
 
         return ResponseEntity.ok(resposta);
     }
 
     @GetMapping("/listar/usuario/{usuarioId}")
-    public List<Jogo> listarJogos(@PathVariable  Long usuarioId) {
+    public List<Jogo> listarJogos(@PathVariable Long usuarioId) {
         var usuario = usuarioRepository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
         return repository.findByJogador(usuario);
     }
@@ -91,23 +90,38 @@ public class JogoController {
             return ResponseEntity.badRequest().build();
         }
 
+        jogo.setTurnoAtual(jogo.getTurnoAtual() + 1);
+
         List<Evento> todosEventos = eventoRepository.findAll();
         List<Evento> eventosValidos = new ArrayList<>();
+        List<Evento> eventosObrigatorios = new ArrayList<>();
 
         for (Evento evento : todosEventos) {
             if (evento.verificarRequisitos(jogo)) {
-                eventosValidos.add(evento);
+                if (evento.isObrigatorio()) {
+                    eventosObrigatorios.add(evento);
+                } else {
+                    eventosValidos.add(evento);
+                }
             }
         }
 
-        if (eventosValidos.isEmpty()) {
+        if (eventosObrigatorios.isEmpty() && eventosValidos.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        Evento eventoSorteado = jogo.sortearEvento(eventosValidos);
+        Evento eventoSorteado;
+
+        if (!eventosObrigatorios.isEmpty()) {
+            eventoSorteado = jogo.sortearEvento(eventosObrigatorios);
+        } else {
+            eventoSorteado = jogo.sortearEvento(eventosValidos);
+        }
+
         jogo.setEventoAtual(eventoSorteado);
 
-        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(eventoSorteado.getId());
+        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(
+                eventoSorteado.getId());
 
         List<Decisao> decisoesValidas = new ArrayList<>();
 
@@ -121,24 +135,28 @@ public class JogoController {
         }
 
         List<Decisao> decisoesSorteadas = new ArrayList<>();
-        while (!decisoesValidas.isEmpty() && decisoesSorteadas.size() < 3) {
 
+        while (!decisoesValidas.isEmpty() && decisoesSorteadas.size() < 3) {
             Decisao decisaoSorteada = jogo.sortearDecisao(decisoesValidas);
 
             decisoesSorteadas.add(decisaoSorteada);
             decisoesValidas.remove(decisaoSorteada);
         }
 
-        jogo.setTurnoAtual(jogo.getTurnoAtual() + 1);   
+        if (eventoSorteado.isFinalizaJogo()) {
+            jogo.setStatus("FINALIZADO");
+        }
 
         repository.save(jogo);
-        EventoGeradoResponse resposta = new EventoGeradoResponse(eventoSorteado, decisoesSorteadas);
+
+        EventoGeradoResponse resposta = new EventoGeradoResponse(eventoSorteado,decisoesSorteadas);
 
         return ResponseEntity.ok(resposta);
     }
 
     @GetMapping("/{jogoId}/escolha/{escolhaId}")
-    public ResponseEntity<ProcessarEscolhaResponse> processarEscolha(@PathVariable Long jogoId, @PathVariable Long escolhaId){
+    public ResponseEntity<ProcessarEscolhaResponse> processarEscolha(@PathVariable Long jogoId,
+            @PathVariable Long escolhaId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
         var evento = jogo.getEventoAtual();
 
@@ -147,10 +165,9 @@ public class JogoController {
         repository.save(jogo);
 
         var resposta = new ProcessarEscolhaResponse(
-            consequencia.getValorPontuacao(),
-            consequencia.getDescricao(),
-            jogo.getPontuacaoAtual()
-        );
+                consequencia.getValorPontuacao(),
+                consequencia.getDescricao(),
+                jogo.getPontuacaoAtual());
 
         return ResponseEntity.ok(resposta);
     }

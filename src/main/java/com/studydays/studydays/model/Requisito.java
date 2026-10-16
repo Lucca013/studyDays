@@ -50,6 +50,9 @@ public class Requisito {
             case "MELHORIA_ADQUIRIDA":
                 return jogo.getListaMelhorias().stream().anyMatch(melhoria -> melhoria.getId().equals((long) valor));
 
+            case "PONTUACAO_MENOR_QUE":
+                return jogo.getPontuacaoAtual() < valor;
+
             default:
                 return false;
         }
