@@ -15,7 +15,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +22,6 @@ import lombok.Setter;
 @Table 
 @Entity 
 @NoArgsConstructor 
-@AllArgsConstructor
 @Getter 
 @Setter  
 public class Evento {
@@ -46,6 +44,9 @@ public class Evento {
 
     @Column(nullable = false)
     private boolean finalizaJogo;
+
+    @Column(nullable = false)
+    private boolean recompensaPontoMelhoria;
 
     @OneToMany(mappedBy = "evento")
     private List<Dialogo> dialogos = new ArrayList<>();

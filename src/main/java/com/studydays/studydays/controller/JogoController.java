@@ -79,15 +79,32 @@ public class JogoController {
     @GetMapping("/listar/usuario/{usuarioId}")
     public List<Jogo> listarJogos(@PathVariable Long usuarioId) {
         var usuario = usuarioRepository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
-        return repository.findByJogador(usuario);
+        var todosJogos = repository.findByJogador(usuario);
+        List<Jogo> jogosValidos = new ArrayList<>();
+
+        for(Jogo jogo : todosJogos){
+            if(jogo.getStatus() != "FINALIZADO"){
+                jogosValidos.add(jogo);
+            }   
+        }
+
+        return jogosValidos;
     }
 
     @PostMapping("/avancarEvento/{jogoId}")
     public ResponseEntity<EventoGeradoResponse> avancarEvento(@PathVariable Long jogoId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
-
+        
         if (jogo.getStatus().equals("FINALIZADO")) {
             return ResponseEntity.badRequest().build();
+        }
+
+        Evento evento = jogo.getEventoAtual();
+
+        if (evento.isRecompensaPontoMelhoria()) {
+            jogo.setPontoMelhoria(
+                jogo.getPontoMelhoria() + 1
+            );
         }
 
         jogo.setTurnoAtual(jogo.getTurnoAtual() + 1);
@@ -96,12 +113,12 @@ public class JogoController {
         List<Evento> eventosValidos = new ArrayList<>();
         List<Evento> eventosObrigatorios = new ArrayList<>();
 
-        for (Evento evento : todosEventos) {
-            if (evento.verificarRequisitos(jogo)) {
-                if (evento.isObrigatorio()) {
-                    eventosObrigatorios.add(evento);
+        for (Evento eventoLista : todosEventos) {
+            if (eventoLista.verificarRequisitos(jogo)) {
+                if (eventoLista.isObrigatorio()) {
+                    eventosObrigatorios.add(eventoLista);
                 } else {
-                    eventosValidos.add(evento);
+                    eventosValidos.add(eventoLista);
                 }
             }
         }
@@ -120,8 +137,7 @@ public class JogoController {
 
         jogo.setEventoAtual(eventoSorteado);
 
-        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(
-                eventoSorteado.getId());
+        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(eventoSorteado.getId());
 
         List<Decisao> decisoesValidas = new ArrayList<>();
 

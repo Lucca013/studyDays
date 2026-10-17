@@ -16,8 +16,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +23,7 @@ import lombok.Setter;
 @Table
 @Getter
 @Setter
-@AllArgsConstructor
+
 public class Jogo {
 
     @Id
@@ -49,9 +47,6 @@ public class Jogo {
 
     @Column(nullable = false)
     private int pontuacaoAtual;
-
-    @Column(nullable = false)
-    private int faseAtual;
 
     @Column(nullable = false)
     private int turnoAtual;
@@ -86,7 +81,6 @@ public class Jogo {
         this.status = "INICIADO";
         this.pontoMelhoria = 0;
         this.pontuacaoAtual = 0;
-        this.faseAtual = 0;
         this.turnoAtual = 0;
         this.listaMelhorias = new ArrayList<>();
     }
