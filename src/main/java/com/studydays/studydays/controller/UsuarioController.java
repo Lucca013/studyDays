@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +25,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/usuario")
 public class UsuarioController {
     private final UsuarioRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(UsuarioRepository usuarioRepository) {
+    public UsuarioController(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.repository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/listar/{usuarioId}")
@@ -49,6 +52,7 @@ public class UsuarioController {
         // Se for um nome já cadastrado antes, joga a exception (retorna um erro do banco se não tratar aqui)
 
         usuario.setId(null);
+        usuario.setSenhaHash(passwordEncoder.encode(usuario.getSenhaHash()));
         repository.save(usuario);
         
         var resposta = new AutenticadoResponse(usuario.getId(), usuario.getNome());
@@ -58,7 +62,10 @@ public class UsuarioController {
     @PostMapping("/autenticar")
     public ResponseEntity<AutenticadoResponse> autenticarUsuario(@Valid @RequestBody Usuario login) {
         var usuario = repository.findByNome(login.getNome()).orElseThrow(AutenticacaoException::new);
-        if(!usuario.getSenhaHash().equals(login.getSenhaHash())){throw new AutenticacaoException();}
+        
+        if(!passwordEncoder.matches(login.getSenhaHash(), usuario.getSenhaHash())){
+            throw new AutenticacaoException();
+        }
 
         var resposta = new AutenticadoResponse(usuario.getId(),usuario.getNome());
         return ResponseEntity.ok(resposta);

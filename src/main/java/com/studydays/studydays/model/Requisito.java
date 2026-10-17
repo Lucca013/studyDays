@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Requisito {
 
     @Id
@@ -29,9 +27,6 @@ public class Requisito {
 
     public boolean validar(Jogo jogo) {
         switch (tipo) {
-            case "FASE_MINIMA":
-                return jogo.getFaseAtual() >= valor;
-
             case "TURNO_MINIMO":
                 return jogo.getTurnoAtual() >= valor;
 
@@ -40,9 +35,6 @@ public class Requisito {
 
             case "PONTOS_MELHORIA_MINIMO":
                 return jogo.getPontoMelhoria() >= valor;
-
-            case "FASE_EXATA":
-                return jogo.getFaseAtual() == valor;
 
             case "TURNO_EXATO":
                 return jogo.getTurnoAtual() == valor;
