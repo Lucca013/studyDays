@@ -51,6 +51,9 @@ public class Evento {
     @OneToMany(mappedBy = "evento")
     private List<Dialogo> dialogos = new ArrayList<>();
 
+    @Column(nullable = true)
+    private String dica;
+
     @ManyToMany 
     @JoinTable (
         name = "RequisitosEvento",

@@ -30,6 +30,11 @@ public class MelhoriaController {
         this.jogoRepository = jogoRepository;
     }
 
+    @GetMapping("/listar")
+    public List<Melhoria> listarTodos() {
+        return repository.findAll();
+    }
+
     @GetMapping("/listar/{jogoId}")
     public List<ListaMelhoriaResponse> exibirArvoreMelhoria(@PathVariable Long jogoId) {
         var jogo = jogoRepository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);

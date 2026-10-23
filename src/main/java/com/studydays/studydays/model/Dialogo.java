@@ -10,13 +10,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
  
 @NoArgsConstructor 
-@AllArgsConstructor 
 @Getter 
 @Setter 
 @Table 
@@ -34,6 +32,7 @@ public class Dialogo {
 
     @Column (nullable = false)
     private String spritePersonagem;
+    // vou tirar isso aqui eventualmente, não agora
 
     @Column (nullable = false)
     private String movimentacaoPersonagem;

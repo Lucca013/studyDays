@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,11 +26,12 @@ import jakarta.validation.Valid;
 @RequestMapping("/usuario")
 public class UsuarioController {
     private final UsuarioRepository repository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    private final BCryptPasswordEncoder passwordEncoder =
+        new BCryptPasswordEncoder();
+
+    public UsuarioController(UsuarioRepository usuarioRepository) {
         this.repository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/listar/{usuarioId}")
@@ -49,10 +51,13 @@ public class UsuarioController {
     public ResponseEntity<AutenticadoResponse> cadastrarUsuario(@Valid @RequestBody Usuario usuario) {
         var usuarioExistente = repository.findByNome(usuario.getNome());
         if (usuarioExistente.isPresent()){throw new NomeJaRegistradoException();} 
-        // Se for um nome já cadastrado antes, joga a exception (retorna um erro do banco se não tratar aqui)
 
         usuario.setId(null);
-        usuario.setSenhaHash(passwordEncoder.encode(usuario.getSenhaHash()));
+
+        String senha = usuario.getSenhaHash();
+        String senhaCriptografada = passwordEncoder.encode(senha);
+        usuario.setSenhaHash(senhaCriptografada);
+
         repository.save(usuario);
         
         var resposta = new AutenticadoResponse(usuario.getId(), usuario.getNome());
@@ -63,7 +68,9 @@ public class UsuarioController {
     public ResponseEntity<AutenticadoResponse> autenticarUsuario(@Valid @RequestBody Usuario login) {
         var usuario = repository.findByNome(login.getNome()).orElseThrow(AutenticacaoException::new);
         
-        if(!passwordEncoder.matches(login.getSenhaHash(), usuario.getSenhaHash())){
+        boolean senhaCorreta = passwordEncoder.matches(login.getSenhaHash(),usuario.getSenhaHash());
+
+        if (!senhaCorreta) {
             throw new AutenticacaoException();
         }
 

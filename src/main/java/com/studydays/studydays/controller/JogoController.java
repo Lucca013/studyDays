@@ -2,6 +2,7 @@ package com.studydays.studydays.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.studydays.studydays.exception.JogoNaoEncontradoException;
 import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
 import com.studydays.studydays.model.Consequencia;
@@ -83,9 +83,9 @@ public class JogoController {
         List<Jogo> jogosValidos = new ArrayList<>();
 
         for(Jogo jogo : todosJogos){
-            if(jogo.getStatus() != "FINALIZADO"){
+            if (!"FINALIZADO".equals(jogo.getStatus())) {
                 jogosValidos.add(jogo);
-            }   
+            }
         }
 
         return jogosValidos;
@@ -206,5 +206,40 @@ public class JogoController {
             }
         }
         return ResponseEntity.ok(decisoesValidas);
+    }
+
+    @GetMapping("/{jogoId}/dicas")
+    public ResponseEntity<String> obterDica(@PathVariable Long jogoId){
+        var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
+        List<String> dicasPossiveis = new ArrayList<>();
+
+        if (jogo.getPontoMelhoria() > 0) {
+            dicasPossiveis.add(
+                (
+                    "Você possui pontos de melhoria disponíveis. Considere utilizá-los antes de continuar."
+                )
+            );
+        }
+
+        if (jogo.getPontuacaoAtual() < 0) {
+            dicasPossiveis.add(
+                (
+                    "Sua pontuação está baixa. Nas próximas decisões, procure analisar com mais atenção quais estratégias de estudo são mais eficientes."
+                )
+            );
+        }
+
+        if (jogo.getEventoAtual().getDica() != null) {
+            dicasPossiveis.add(jogo.getEventoAtual().getDica());
+        }
+        
+        if (dicasPossiveis.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        Random random = new Random();
+        String dica = dicasPossiveis.get(random.nextInt(dicasPossiveis.size()));
+        
+        return ResponseEntity.ok(dica);
     }
 }
