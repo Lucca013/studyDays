@@ -1,0 +1,9 @@
+target/
+.git/
+.github/
+.vscode/
+.idea/
+*.db
+*.sqlite
+*.sqlite3
+.env
