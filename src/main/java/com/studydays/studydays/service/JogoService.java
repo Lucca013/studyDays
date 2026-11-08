@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.studydays.studydays.dto.EventoGeradoResponse;
 import com.studydays.studydays.dto.JogoResponse;
 import com.studydays.studydays.dto.ProcessarEscolhaResponse;
+import com.studydays.studydays.exception.EventoNaoEncontradoException;
+import com.studydays.studydays.exception.JogoFinalizadoException;
 import com.studydays.studydays.exception.JogoNaoEncontradoException;
 import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
 import com.studydays.studydays.model.Consequencia;
@@ -38,12 +37,13 @@ public class JogoService {
         this.consequenciaRepository = consequenciaRepository;
     }
 
+    @Transactional 
     public Jogo iniciarNovoJogo(Long usuarioId) {
         var usuario = usuarioRepository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
-        var evento = eventoRepository.findById(1L);
+        var evento = eventoRepository.findById(1L).orElseThrow(EventoNaoEncontradoException::new);
         Jogo jogo = new Jogo();
         jogo.setJogador(usuario);
-        jogo.setEventoAtual(evento.get());
+        jogo.setEventoAtual(evento);
         Jogo salvo = repository.save(jogo);
         return salvo;
     }
@@ -73,11 +73,12 @@ public class JogoService {
         return jogosValidos;
     }
 
-public ResponseEntity<EventoGeradoResponse> avancarEvento(Long jogoId) {
+    @Transactional 
+    public EventoGeradoResponse avancarEvento(Long jogoId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
         
         if (jogo.getStatus().equals("FINALIZADO")) {
-            return ResponseEntity.badRequest().build();
+            throw new JogoFinalizadoException();
         }
 
         Evento evento = jogo.getEventoAtual();
@@ -105,7 +106,7 @@ public ResponseEntity<EventoGeradoResponse> avancarEvento(Long jogoId) {
         }
 
         if (eventosObrigatorios.isEmpty() && eventosValidos.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new EventoNaoEncontradoException();
         }
 
         Evento eventoSorteado;
@@ -147,10 +148,10 @@ public ResponseEntity<EventoGeradoResponse> avancarEvento(Long jogoId) {
         repository.save(jogo);
 
         EventoGeradoResponse resposta = new EventoGeradoResponse(eventoSorteado,decisoesSorteadas);
-
-        return ResponseEntity.ok(resposta);
+        return resposta;
     }
 
+    @Transactional 
     public ProcessarEscolhaResponse processarEscolha(Long jogoId, Long escolhaId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
         var evento = jogo.getEventoAtual();
@@ -167,7 +168,7 @@ public ResponseEntity<EventoGeradoResponse> avancarEvento(Long jogoId) {
         return resposta;
     }
 
-    public ResponseEntity<List<Decisao>> listarDecisoesValidas(Long jogoId) {
+    public List<Decisao> listarDecisoesValidas(Long jogoId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
 
         var eventoAtual = jogo.getEventoAtual();
@@ -182,7 +183,7 @@ public ResponseEntity<EventoGeradoResponse> avancarEvento(Long jogoId) {
                 decisoesValidas.add(decisao);
             }
         }
-        return ResponseEntity.ok(decisoesValidas);
+        return decisoesValidas;
     }
 
 
@@ -208,6 +209,10 @@ public ResponseEntity<EventoGeradoResponse> avancarEvento(Long jogoId) {
 
         if (jogo.getEventoAtual().getDica() != null) {
             dicasPossiveis.add(jogo.getEventoAtual().getDica());
+        }
+
+        if (dicasPossiveis.isEmpty()) {
+            return null;
         }
     
         Random random = new Random();
