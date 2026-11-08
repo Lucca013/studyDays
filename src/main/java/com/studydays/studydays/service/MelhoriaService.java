@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.studydays.studydays.dto.ListaMelhoriaResponse;
 import com.studydays.studydays.dto.MelhoriaAdquiridaResponse;
@@ -68,6 +69,7 @@ public class MelhoriaService {
         return ordem;
     }
 
+    @Transactional 
     public MelhoriaAdquiridaResponse liberarMelhoria(Long melhoriaId, Long jogoId){
         var jogo = jogoRepository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
         var melhoria = repository.findById(melhoriaId).orElseThrow();
