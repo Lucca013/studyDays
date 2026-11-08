@@ -3,7 +3,6 @@ package com.studydays.studydays.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.studydays.studydays.dto.AutenticadoResponse;
 import com.studydays.studydays.exception.AutenticacaoException;
@@ -28,7 +27,7 @@ public class UsuarioService {
     }
 
     @Transactional 
-    public AutenticadoResponse cadastrarUsuario(@RequestBody Usuario usuario){
+    public AutenticadoResponse cadastrarUsuario(Usuario usuario){
         var usuarioExistente = repository.findByNome(usuario.getNome());
         if (usuarioExistente.isPresent()){throw new NomeJaRegistradoException();} 
 
@@ -44,7 +43,7 @@ public class UsuarioService {
         return resposta;
     }
 
-    public AutenticadoResponse autenticarUsuario(@RequestBody Usuario login){
+    public AutenticadoResponse autenticarUsuario(Usuario login){
         var usuario = repository.findByNome(login.getNome()).orElseThrow(AutenticacaoException::new);
         boolean senhaCorreta = passwordEncoder.matches(login.getSenhaHash(),usuario.getSenhaHash());
 
