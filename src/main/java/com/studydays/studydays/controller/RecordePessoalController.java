@@ -9,42 +9,28 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
 import com.studydays.studydays.model.RecordePessoal;
-import com.studydays.studydays.repository.RecordePessoalRepository;
-import com.studydays.studydays.repository.UsuarioRepository;
-
+import com.studydays.studydays.service.RecordePessoalService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/RecordePessoal")
 public class RecordePessoalController {
-    private final RecordePessoalRepository repository;
-    private final UsuarioRepository usuarioRepository;
+    private final RecordePessoalService service;
 
-    public RecordePessoalController(RecordePessoalRepository repository, UsuarioRepository usuarioRepository) {
-        this.repository = repository;
-        this.usuarioRepository = usuarioRepository;
+    public RecordePessoalController(RecordePessoalService service) {
+        this.service = service;
     }
 
-    // Lista todos os recordes de todos os jogadores
-    // dava p limitar p top 100 tambem, coisa assim... na real top 50? top 25? 
     @GetMapping("/listar")
         public List<RecordePessoal> gerarRanking() {
-            return repository.findAllByOrderByValorPontuacaoDesc();
+            return service.gerarRanking();
     }
-
-    // Cadastra um novo recorde pessoal (já vinculando com um ususário) 
-    // n da certo p atualizar, uso um novo endpoint ou trato isso aqui? 
+ 
     @PostMapping("/cadastrar/usuario/{usuarioId}")
     public ResponseEntity<RecordePessoal> cadastrarRecorde(@RequestBody RecordePessoal recordePessoal, @PathVariable Long usuarioId) {
-        var usuario = usuarioRepository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
-
-        recordePessoal.setId(null);
-        recordePessoal.setJogador(usuario);
-
-        RecordePessoal salvo = repository.save(recordePessoal);
+        RecordePessoal salvo = service.cadastrarRecorde(recordePessoal, usuarioId);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 }

@@ -41,7 +41,7 @@ public class UsuarioController {
         return ResponseEntity.ok(resposta);
     }
 
-    @GetMapping("/listar")
+    @GetMapping("/listar") // não é um endpoint que vai ficar depois na versão final 
     public List<Usuario> listarUsuarios() {
         return repository.findAll();
     }

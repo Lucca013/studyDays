@@ -31,10 +31,6 @@ public class Dialogo {
     private String nomePersonagem;
 
     @Column (nullable = false)
-    private String spritePersonagem;
-    // vou tirar isso aqui eventualmente, não agora
-
-    @Column (nullable = false)
     private String movimentacaoPersonagem;
 
     @Column (nullable = false)
