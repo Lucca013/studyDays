@@ -9,7 +9,7 @@ import com.studydays.studydays.model.RecordePessoal;
 import com.studydays.studydays.repository.RecordePessoalRepository;
 import com.studydays.studydays.repository.UsuarioRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RecordePessoalService {

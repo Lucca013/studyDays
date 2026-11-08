@@ -1,10 +1,7 @@
 package com.studydays.studydays.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,67 +10,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.studydays.studydays.dto.AutenticadoResponse;
-import com.studydays.studydays.exception.AutenticacaoException;
-import com.studydays.studydays.exception.NomeJaRegistradoException;
-import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
 import com.studydays.studydays.model.Usuario;
-import com.studydays.studydays.repository.UsuarioRepository;
-
-import jakarta.validation.Valid;
+import com.studydays.studydays.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController {
-    private final UsuarioRepository repository;
+    private final UsuarioService service;
 
-    private final BCryptPasswordEncoder passwordEncoder =
-        new BCryptPasswordEncoder();
-
-    public UsuarioController(UsuarioRepository usuarioRepository) {
-        this.repository = usuarioRepository;
+    public UsuarioController(UsuarioService service) {
+        this.service = service;
     }
 
     @GetMapping("/listar/{usuarioId}")
     public ResponseEntity<AutenticadoResponse> listarUsuarioEspecifico(@PathVariable Long usuarioId) {
-        var usuario = repository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
-        
-        var resposta = new AutenticadoResponse(usuario.getId(),usuario.getNome());
+        AutenticadoResponse resposta = service.listarUsuarioEspecifico(usuarioId);
         return ResponseEntity.ok(resposta);
     }
 
-    @GetMapping("/listar") // não é um endpoint que vai ficar depois na versão final 
-    public List<Usuario> listarUsuarios() {
-        return repository.findAll();
-    }
-
     @PostMapping("/cadastrar")
-    public ResponseEntity<AutenticadoResponse> cadastrarUsuario(@Valid @RequestBody Usuario usuario) {
-        var usuarioExistente = repository.findByNome(usuario.getNome());
-        if (usuarioExistente.isPresent()){throw new NomeJaRegistradoException();} 
-
-        usuario.setId(null);
-
-        String senha = usuario.getSenhaHash();
-        String senhaCriptografada = passwordEncoder.encode(senha);
-        usuario.setSenhaHash(senhaCriptografada);
-
-        repository.save(usuario);
-        
-        var resposta = new AutenticadoResponse(usuario.getId(), usuario.getNome());
+    public ResponseEntity<AutenticadoResponse> cadastrarUsuario(@RequestBody Usuario usuario) {
+        AutenticadoResponse resposta = service.cadastrarUsuario(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
     @PostMapping("/autenticar")
-    public ResponseEntity<AutenticadoResponse> autenticarUsuario(@Valid @RequestBody Usuario login) {
-        var usuario = repository.findByNome(login.getNome()).orElseThrow(AutenticacaoException::new);
-        
-        boolean senhaCorreta = passwordEncoder.matches(login.getSenhaHash(),usuario.getSenhaHash());
-
-        if (!senhaCorreta) {
-            throw new AutenticacaoException();
-        }
-
-        var resposta = new AutenticadoResponse(usuario.getId(),usuario.getNome());
+    public ResponseEntity<AutenticadoResponse> autenticarUsuario(@RequestBody Usuario login) {
+        AutenticadoResponse resposta = service.autenticarUsuario(login);
         return ResponseEntity.ok(resposta);
     };
 }
