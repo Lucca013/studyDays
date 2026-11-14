@@ -48,7 +48,7 @@
             return ResponseEntity.ok(resposta);
         }
 
-        @GetMapping("/{jogoId}/escolha/{escolhaId}")
+        @PostMapping("/{jogoId}/escolha/{escolhaId}")
         public ResponseEntity<ProcessarEscolhaResponse> processarEscolha(@PathVariable Long jogoId,@PathVariable Long escolhaId) {
             ProcessarEscolhaResponse resposta = service.processarEscolha(jogoId, escolhaId);
             return ResponseEntity.ok(resposta);

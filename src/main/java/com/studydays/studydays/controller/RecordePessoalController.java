@@ -33,4 +33,5 @@ public class RecordePessoalController {
         RecordePessoal salvo = service.cadastrarRecorde(recordePessoal, usuarioId);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
+    // não deveria ser um endpoint, é um processo interno do sistema quando o jogador finaliza um jogo 
 }

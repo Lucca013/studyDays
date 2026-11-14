@@ -19,11 +19,11 @@ public class MelhoriaController {
 
     MelhoriaController(MelhoriaService service) {
         this.service = service;
-    }
+    } 
 
     @GetMapping("/listar/{jogoId}")
-    public List<ListaMelhoriaResponse> exibirArvoreMelhoria(@PathVariable Long jogoId) {
-        return service.exibirArvoreMelhoria(jogoId);
+    public ResponseEntity<List<ListaMelhoriaResponse>> exibirArvoreMelhoria(@PathVariable Long jogoId) {
+        return ResponseEntity.ok(service.exibirArvoreMelhoria(jogoId));
     }
 
     @PostMapping("/liberar/{melhoriaId}/jogo/{jogoId}")
