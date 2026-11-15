@@ -7,7 +7,7 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.studydays.studydays.dto.EventoGeradoResponse;
+import com.studydays.studydays.dto.DecisaoResponse;
 import com.studydays.studydays.dto.JogoResponse;
 import com.studydays.studydays.dto.ProcessarEscolhaResponse;
 import com.studydays.studydays.exception.EventoNaoEncontradoException;
@@ -74,7 +74,7 @@ public class JogoService {
     }
 
     @Transactional 
-    public EventoGeradoResponse avancarEvento(Long jogoId) {
+    public Evento avancarEvento(Long jogoId) {
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
         
         if (jogo.getStatus().equals("FINALIZADO")) {
@@ -118,36 +118,52 @@ public class JogoService {
         }
 
         jogo.setEventoAtual(eventoSorteado);
+        repository.save(jogo);
+        return eventoSorteado;
+    }
 
-        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(eventoSorteado.getId());
+    public List<DecisaoResponse> listarDecisoesValidas(Long jogoId) {
+        var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
+
+        var eventoAtual = jogo.getEventoAtual();
+
+        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(eventoAtual.getId());
 
         List<Decisao> decisoesValidas = new ArrayList<>();
 
         for (Consequencia consequencia : consequencias) {
-
             Decisao decisao = consequencia.getDecisao();
 
-            if (decisao.verificarRequisitos(jogo)) {
+            if (decisao.verificarRequisitos(jogo)
+                    && !decisoesValidas.contains(decisao)) {
+
                 decisoesValidas.add(decisao);
             }
         }
 
         List<Decisao> decisoesSorteadas = new ArrayList<>();
 
-        while (!decisoesValidas.isEmpty() && decisoesSorteadas.size() < 3) {
-            Decisao decisaoSorteada = jogo.sortearDecisao(decisoesValidas);
+        while (!decisoesValidas.isEmpty()
+                && decisoesSorteadas.size() < 3) {
+
+            Decisao decisaoSorteada =
+                jogo.sortearDecisao(decisoesValidas);
 
             decisoesSorteadas.add(decisaoSorteada);
             decisoesValidas.remove(decisaoSorteada);
         }
 
-        if (eventoSorteado.isFinalizaJogo()) {
-            jogo.setStatus("FINALIZADO");
+            List<DecisaoResponse> resposta = new ArrayList<>();
+
+        for (Decisao decisao : decisoesSorteadas) {
+            resposta.add(
+                new DecisaoResponse(
+                    decisao.getId(),
+                    decisao.getDescricao()
+                )
+            );
         }
 
-        repository.save(jogo);
-
-        EventoGeradoResponse resposta = new EventoGeradoResponse(eventoSorteado,decisoesSorteadas);
         return resposta;
     }
 
@@ -167,25 +183,6 @@ public class JogoService {
 
         return resposta;
     }
-
-    public List<Decisao> listarDecisoesValidas(Long jogoId) {
-        var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
-
-        var eventoAtual = jogo.getEventoAtual();
-
-        List<Consequencia> consequencias = consequenciaRepository.findByEventoId(eventoAtual.getId());
-        List<Decisao> decisoesValidas = new ArrayList<>();
-
-        for (Consequencia consequencia : consequencias) {
-            Decisao decisao = consequencia.getDecisao();
-
-            if (decisao.verificarRequisitos(jogo) && !decisoesValidas.contains(decisao)) {
-                decisoesValidas.add(decisao);
-            }
-        }
-        return decisoesValidas;
-    }
-
 
     public String obterDica(Long jogoId){
         var jogo = repository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);

@@ -10,9 +10,10 @@
     import org.springframework.web.bind.annotation.RequestMapping;
     import org.springframework.web.bind.annotation.RestController;
     import com.studydays.studydays.model.Decisao;
+    import com.studydays.studydays.model.Evento;
     import com.studydays.studydays.model.Jogo;
     import com.studydays.studydays.dto.ProcessarEscolhaResponse;
-    import com.studydays.studydays.dto.EventoGeradoResponse;
+    import com.studydays.studydays.dto.DecisaoResponse;
     import com.studydays.studydays.dto.JogoResponse;
     import com.studydays.studydays.service.JogoService;
 
@@ -43,21 +44,21 @@
         }
 
         @PostMapping("/avancarEvento/{jogoId}")
-        public ResponseEntity<EventoGeradoResponse> avancarEvento(@PathVariable Long jogoId) {
-            EventoGeradoResponse resposta = service.avancarEvento(jogoId);
+        public ResponseEntity<Evento> avancarEvento(@PathVariable Long jogoId) {
+            Evento resposta = service.avancarEvento(jogoId);
             return ResponseEntity.ok(resposta);
+        }
+
+        @GetMapping("/{jogoId}/escolhas")
+        public ResponseEntity<List<DecisaoResponse>>  listarDecisoesValidas(@PathVariable Long jogoId) {
+            List<DecisaoResponse> lista = service.listarDecisoesValidas(jogoId);
+            return ResponseEntity.ok(lista);
         }
 
         @PostMapping("/{jogoId}/escolha/{escolhaId}")
         public ResponseEntity<ProcessarEscolhaResponse> processarEscolha(@PathVariable Long jogoId,@PathVariable Long escolhaId) {
             ProcessarEscolhaResponse resposta = service.processarEscolha(jogoId, escolhaId);
             return ResponseEntity.ok(resposta);
-        }
-
-        @GetMapping("/{jogoId}/escolhas")
-        public ResponseEntity<List<Decisao>> listarDecisoesValidas(@PathVariable Long jogoId) {
-            List<Decisao> lista = service.listarDecisoesValidas(jogoId);
-            return ResponseEntity.ok(lista);
         }
 
         @GetMapping("/{jogoId}/dicas")
