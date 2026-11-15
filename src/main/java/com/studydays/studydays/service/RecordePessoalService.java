@@ -1,40 +1,51 @@
 package com.studydays.studydays.service;
 
+import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
-import com.studydays.studydays.exception.UsuarioNaoEncontradoException;
+import org.springframework.transaction.annotation.Transactional;
+import com.studydays.studydays.model.Jogo;
 import com.studydays.studydays.model.RecordePessoal;
 import com.studydays.studydays.repository.RecordePessoalRepository;
-import com.studydays.studydays.repository.UsuarioRepository;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RecordePessoalService {
-    private final RecordePessoalRepository repository;
-    private final UsuarioRepository usuarioRepository;
 
-    public RecordePessoalService(RecordePessoalRepository repository, UsuarioRepository usuarioRepository) {
+    private final RecordePessoalRepository repository;
+
+    public RecordePessoalService(
+            RecordePessoalRepository repository) {
+
         this.repository = repository;
-        this.usuarioRepository = usuarioRepository;
     }
 
     @Transactional
-    public RecordePessoal cadastrarRecorde(RecordePessoal recordePessoal, Long usuarioId){
-        var usuario = usuarioRepository.findById(usuarioId).orElseThrow(UsuarioNaoEncontradoException::new);
+    public void atualizarRecorde(Jogo jogo) {
+        var usuario = jogo.getJogador();
+        int pontuacao = jogo.getPontuacaoAtual();
 
-        recordePessoal.setId(null);
-        recordePessoal.setJogador(usuario);
+        var recordeExistente = repository.findByJogador(usuario);
+        if (recordeExistente.isPresent()) {
+            RecordePessoal recorde = recordeExistente.get();
 
-        RecordePessoal salvo = repository.save(recordePessoal);
-        return salvo;
+            if (pontuacao >= recorde.getValorPontuacao()) {
+                recorde.setValorPontuacao(pontuacao);
+                recorde.setDataObtida(LocalDate.now().toString());
+                repository.save(recorde);
+            }
+
+        } else {
+            RecordePessoal novoRecorde = new RecordePessoal();
+
+            novoRecorde.setJogador(usuario);
+            novoRecorde.setValorPontuacao(pontuacao);
+            novoRecorde.setDataObtida(LocalDate.now().toString());
+
+            repository.save(novoRecorde);
+        }
     }
 
-    public List<RecordePessoal> gerarRanking(){
+    public List<RecordePessoal> gerarRanking() {
         return repository.findAllByOrderByValorPontuacaoDesc();
     }
-
-
 }

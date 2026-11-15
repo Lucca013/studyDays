@@ -29,12 +29,14 @@ public class JogoService {
     private final UsuarioRepository usuarioRepository;
     private final EventoRepository eventoRepository;
     private final ConsequenciaRepository consequenciaRepository;
+    private final RecordePessoalService recordePessoalService;
 
-    public JogoService(JogoRepository repository, UsuarioRepository usuarioRepository, EventoRepository eventoRepository, ConsequenciaRepository consequenciaRepository) {
+    public JogoService(JogoRepository repository, UsuarioRepository usuarioRepository, EventoRepository eventoRepository, ConsequenciaRepository consequenciaRepository, RecordePessoalService recordePessoalService) {
         this.repository = repository;
         this.usuarioRepository = usuarioRepository;
         this.eventoRepository = eventoRepository;
         this.consequenciaRepository = consequenciaRepository;
+        this.recordePessoalService = recordePessoalService;
     }
 
     @Transactional 
@@ -121,6 +123,7 @@ public class JogoService {
 
         if (eventoSorteado.isFinalizaJogo()) {
             jogo.setStatus("FINALIZADO");
+            recordePessoalService.atualizarRecorde(jogo);
         }
 
         repository.save(jogo);
