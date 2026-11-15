@@ -26,13 +26,23 @@ public class MelhoriaService {
         this.jogoRepository = jogoRepository;
     }
 
-    public List<ListaMelhoriaResponse> exibirArvoreMelhoria(Long jogoId){
-        var jogo = jogoRepository.findById(jogoId).orElseThrow(JogoNaoEncontradoException::new);
+    public List<ListaMelhoriaResponse> exibirArvoreMelhoria(Long jogoId) {
+        var jogo = jogoRepository.findById(jogoId)
+                .orElseThrow(JogoNaoEncontradoException::new);
 
         List<ListaMelhoriaResponse> resposta = new ArrayList<>();
 
         for (Melhoria melhoria : repository.findAll()) {
-            boolean adquirida = jogo.getListaMelhorias().stream().anyMatch(m -> m.getId().equals(melhoria.getId()));
+
+            boolean adquirida = false;
+
+            for (Melhoria melhoriaAdquirida : jogo.getListaMelhorias()) {
+                if (melhoriaAdquirida.getId().equals(melhoria.getId())) {
+                    adquirida = true;
+                    break;
+                }
+            }
+
             String status;
 
             if (adquirida) {
@@ -44,12 +54,14 @@ public class MelhoriaService {
             }
 
             resposta.add(new ListaMelhoriaResponse(
-                            melhoria.getId(),
-                            melhoria.getNome(),
-                            melhoria.getDescricao(),
-                            status,
-                            calcularOrdem(melhoria)));
+                    melhoria.getId(),
+                    melhoria.getNome(),
+                    melhoria.getDescricao(),
+                    status,
+                    calcularOrdem(melhoria)
+            ));
         }
+
         return resposta;
     }
 
