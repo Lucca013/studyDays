@@ -118,6 +118,11 @@ public class JogoService {
         }
 
         jogo.setEventoAtual(eventoSorteado);
+
+        if (eventoSorteado.isFinalizaJogo()) {
+            jogo.setStatus("FINALIZADO");
+        }
+
         repository.save(jogo);
         return eventoSorteado;
     }

@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,6 +50,7 @@ public class Evento {
     private boolean recompensaPontoMelhoria;
 
     @OneToMany(mappedBy = "evento")
+    @OrderBy("ordemFala ASC")
     private List<Dialogo> dialogos = new ArrayList<>();
 
     @Column(nullable = true)
